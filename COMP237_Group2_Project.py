@@ -14,6 +14,9 @@ import pandas as pd
 import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
+from sklearn.naive_bayes import MultinomialNB
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.model_selection import cross_val_score
 
 # 1. Load the data into a pandas data frame.
 
@@ -132,8 +135,25 @@ print(f"Testing set size: {len(X_test)}")
 """
 # 8. Fit the training data into a Naive Bayes classifier.
 
+model = MultinomialNB()
+model.fit(X_train_tfidf, y_train)
+
+y_pred = model.predict(X_test_tfidf)
+
+accuracy = accuracy_score(y_test, y_pred)
+report = classification_report(y_test, y_pred)
+
+print(f'Accuracy: {accuracy}')
+print(f'Classification Report:\n{report}')
+
 # 9. Cross validate the model on the training data using 5-fold 
 # and print the mean results of model accuracy.
+
+cross_val_scores = cross_val_score(model, X_train_tfidf, y_train, cv=5)
+mean_accuracy = np.mean(cross_val_scores)
+
+print(f'Cross-Validation Scores: {cross_val_scores}')
+print(f'Mean Cross-Validation Accuracy: {mean_accuracy}')
 
 # 10. Test the model on the test data, 
 # print the confusion matrix and the accuracy of the model.
