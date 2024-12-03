@@ -17,6 +17,8 @@ from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.metrics import accuracy_score, classification_report
 from sklearn.model_selection import cross_val_score
+from sklearn.metrics import confusion_matrix
+
 
 # 1. Load the data into a pandas data frame.
 
@@ -128,9 +130,38 @@ print(f'Mean Cross-Validation Accuracy: {mean_accuracy}')
 # 10. Test the model on the test data, 
 # print the confusion matrix and the accuracy of the model.
 
+conf_matrix = confusion_matrix(y_test, y_pred)
+accuracy = accuracy_score(y_test, y_pred)
+
+print("Task #10 Results:")
+print("Confusion Matrix:")
+print(conf_matrix)
+print(f"Accuracy: {accuracy * 100:.2f}%")
+
 # 11. As a group come up with 6 new comments 
 # (4 comments should be non spam and 2 comment spam) 
 # and pass them to the classifier and check the results.
+
+new_comments = [
+    "I absolutely love this song!",
+    "Shakira's performance is incredible.",
+    "Great video, well done!",
+    "This is my favorite song of all time!",
+    "Click here to win a free iPhone!",
+    "Subscribe to my channel for more amazing content!"
+]
+
+# Transform new comments into the same vectorized format
+new_comments_tc = count_vectorizer.transform(new_comments)
+new_comments_tfidf = tfidf.transform(new_comments_tc)
+
+# Predict using the trained model
+new_predictions = model.predict(new_comments_tfidf)
+
+print("\nTask #11 Results:")
+for comment, prediction in zip(new_comments, new_predictions):
+    label = "Spam" if prediction == 1 else "Non-spam"
+    print(f"Comment: {comment}\nPrediction: {label}\n")
 
 # 12. Present all the results and conclusions.
 
