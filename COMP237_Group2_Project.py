@@ -48,42 +48,12 @@ print(data.describe())
 print("X and Y Column names:")
 print(data.columns)
 
-"""
-# 3. Using nltk toolkit classes and methods prepare the data for model building, 
-# refer to the third lab tutorial in module 11 (Building a Category text predictor ). 
-# Use count_vectorizer.fit_transform().
-
-count_vectorizer = CountVectorizer()
-train_tc = count_vectorizer.fit_transform(X)
-
-# 4. Present highlights of the output (initial features) 
-# such as the new shape of the data and any other useful information before proceeding. 
-print("\n4. Present highlights of the output (initial features) ")
-print("\nDimensions of training data:", train_tc.shape) # (370, 1357) = 370 comments, 1357 =  number of unique words in the dataset
-print("\ndata type:",type(train_tc))
-print("\nMax value:", train_tc.max()) # max word count = 16 means at least one word appears 16 times in at least one commnet
-print("Min value:", train_tc.min()) # min word count = 0 means at least one word does not appear in at least one comment
-print("Mean value:", train_tc.mean()) # mean word count = .013 means most words do not appear often across all comments
-
-
-# 5. Downscale the transformed data using tf-idf (Term Frequency-Inverse Document Frequency)
-# and again present highlights of the output (final features) such as the new shape of the data 
-# and any other useful information before proceeding.
-
-tfidf = TfidfTransformer()
-train_tfidf = tfidf.fit_transform(train_tc)
-print("\n5. Downscale the transformed data using tf-idf (Term Frequency-Inverse Document Frequency and again present highlights of the output (final features))")
-print("\ndata type:",type(train_tfidf))# sparse row matrix because there are many unique words that dont appear in most 
-print("\nDimensions of training data:", train_tfidf.shape)
-print("\nMax value:", train_tfidf.max()) # max word count = 1 because the previous max and min have been normalized so the new range is between 1-0
-print("Min value:", train_tfidf.min()) # min word count = 0 even after normalization 0 is still 0
-print("Mean value:", train_tfidf.mean()) # mean word count = .0021 new mean after data is normalized
-"""
 
 # 6. Use pandas.sample to shuffle the dataset, set frac =1
 shuffled_data = data.sample(frac=1, random_state=42)
 
 # 7. Using pandas split your dataset into 75% for training and 25% for testing
+# make sure to separate the class from the feature(s). (Do not use test_train_ split)
 train_size = int(0.75 * len(shuffled_data))
 
 X_train = shuffled_data['CONTENT'][:train_size]
@@ -93,46 +63,46 @@ X_test = shuffled_data['CONTENT'][train_size:]
 y_test = shuffled_data['CLASS'][train_size:]
 
 
+# 3. Using nltk toolkit classes and methods prepare the data for model building, 
+# refer to the third lab tutorial in module 11 (Building a Category text predictor ). 
+# Use count_vectorizer.fit_transform().
+
 count_vectorizer = CountVectorizer()
 X_train_tc = count_vectorizer.fit_transform(X_train)
+
+X_test_tc = count_vectorizer.transform(X_test)
+
+# 4. Present highlights of the output (initial features) 
+# such as the new shape of the data and any other useful information before proceeding. 
+print("\n4. Present highlights of the output (initial features) ")
+print("\nDimensions of training data:", X_train_tc.shape) # (370, 1357) = 370 comments, 1357 =  number of unique words in the dataset
+print("\ndata type:",type(X_train_tc))
+print("\nMax value:", X_train_tc.max()) # max word count = 16 means at least one word appears 16 times in at least one commnet
+print("Min value:", X_train_tc.min()) # min word count = 0 means at least one word does not appear in at least one comment
+print("Mean value:", X_train_tc.mean()) # mean word count = .013 means most words do not appear often across all comments
+
+
+# 5. Downscale the transformed data using tf-idf (Term Frequency-Inverse Document Frequency)
+# and again present highlights of the output (final features) such as the new shape of the data 
+# and any other useful information before proceeding.
 
 tfidf = TfidfTransformer()
 X_train_tfidf = tfidf.fit_transform(X_train_tc)
 
-count_vectorizer = CountVectorizer()
-X_test_tc = count_vectorizer.fit_transform(X_test)
+X_test_tfidf = tfidf.transform(X_test_tc)
 
-tfidf = TfidfTransformer()
-X_test_tfidf = tfidf.fit_transform(X_test_tc)
-
+print("\n5. Downscale the transformed data using tf-idf (Term Frequency-Inverse Document Frequency and again present highlights of the output (final features))")
+print("\ndata type:",type(X_train_tfidf))# sparse row matrix because there are many unique words that dont appear in most 
+print("\nDimensions of training data:", X_train_tfidf.shape)
+print("\nMax value:", X_train_tfidf.max()) # max word count = 1 because the previous max and min have been normalized so the new range is between 1-0
+print("Min value:", X_train_tfidf.min()) # min word count = 0 even after normalization 0 is still 0
+print("Mean value:", X_train_tfidf.mean()) # mean word count = .0021 new mean after data is normalized
 
 
 print(f"Training set size: {X_train_tfidf}")
 print(f"Testing set size: {X_test_tfidf}")
 
 
-
-
-"""
-# 6. Use pandas.sample to shuffle the dataset, set frac =1
-shuffled_index = pd.DataFrame(index=train_tfidf.index).sample(frac=1, random_state=2).index
-
-# shuffle the index
-X_shuffled = train_tfidf[shuffled_index]
-y_shuffled = y.iloc[shuffled_index].reset_index(drop=True)
-
-# 7. Using pandas split your dataset into 75% for training and 25% for testing
-train_size = int(0.75 * X_shuffled.shape[0])
-
-X_train = X_shuffled[:train_size]
-y_train = y_shuffled[:train_size]
-
-X_test = X_shuffled[train_size:]
-y_test = y_shuffled[train_size:]
-
-print(f"Training set size: {len(X_train)}")
-print(f"Testing set size: {len(X_test)}")
-"""
 # 8. Fit the training data into a Naive Bayes classifier.
 
 model = MultinomialNB()
